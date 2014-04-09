@@ -25,7 +25,8 @@ sub register {
         my $default = $options{'default'} || $conf->{'default'};
         my $size    = $options{'size'}    || $conf->{'size'};
         my $rating  = $options{'rating'}  || $conf->{'rating'};
-        my $scheme  = $options{'scheme'}  || $conf->{scheme} || $c->req->url->to_abs->scheme || 'http';
+        my $scheme  = $options{'scheme'}  || $conf->{'scheme'} || $c->req->url->to_abs->scheme || 'http';
+        my $fluid   = $options{'fluid'}   || $conf->{'fluid'};
 
         my $host = $scheme eq 'https' ? 'secure' : 'www';
         my $url  = "$scheme://$host.gravatar.com/avatar/";
@@ -46,7 +47,10 @@ sub register {
 
         my $url = b($c->gravatar_url(@_))->xml_escape;
 
-        return b "<img src='$url' alt='Gravatar' height='$size' width='$size' />";
+        my $fluid = $options{'fluid'} || $conf->{'fluid'};
+        my $hw = $fluid ? '' : "height='$size' width='$size'";
+
+        return b "<img src='$url' alt='Gravatar' $hw />";
     } );
 }
 
@@ -84,6 +88,7 @@ Mojolicious::Plugin::Gravatar - Globally Recognized Avatars for Mojolicious
       rating  => 'X',  #default was PG
       default => 'http://example.com/default.png' # default was not value
       scheme  => 'https' # if omitted will look in request's url scheme.
+      fluid   => 1 # if true, height and width attributes will be omitted.
   });
 
   # Mojolicious::Lite
@@ -126,6 +131,12 @@ G|PG|R|X. The maximum rating of Gravatar you wish returned. If you have a family
 =head2 scheme (optional)
 
 Gravatar URL scheme "http" or "https". If omitted will look in request's url scheme (if empty fill use "http").
+
+=head2 fluid (optional)
+
+If true, then C<height> and C<width> attributes will B<not> be added to the HTML.  This allows you to create "fluid" images that automatically
+resize, which is common with "responsive" designs.  But the conventional wisdom is to always use C<height> and C<width> attributes on your
+images so the browser can layout the page properly before it downloads the image.
 
 =head1 HELPERS
 

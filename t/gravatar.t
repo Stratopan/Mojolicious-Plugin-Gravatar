@@ -58,6 +58,11 @@ subtest '"gravatar" helper' => sub {
 	like($string, qr{&amp;}, 'Image URL escaping');
 };
 
+subtest '"fluid" option' => sub {
+	my $string = $app->gravatar_url('user@mail.com' => (fluid => 1));
+	unlike($string, qr{height}, 'No height attribute');
+	unlike($string, qr{width}, 'No width attribute');
+};
 
 done_testing;
 
